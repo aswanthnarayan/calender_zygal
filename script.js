@@ -1,8 +1,20 @@
 document.addEventListener('DOMContentLoaded', function () {
     const currentDate = new Date();
-    let selectedDates = [];
+    let selectedDates = [currentDate];
     let calendarGrid = document.getElementById('calendarData');
     let selectedDate = document.getElementById('selectedDates')
+    
+
+    function markCurrentDate() {
+        const dateCells = document.querySelectorAll('.date');
+        dateCells.forEach(dateCell => {
+            const date = new Date(dateCell.getAttribute('data-date'));
+            if (date.toDateString() === currentDate.toDateString()) {
+                dateCell.parentElement.classList.add('selected');
+            }
+        });
+    }
+
 
     // to generate calender
     function generateCalendarData() {
@@ -22,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 weeks.push(week);
                 week = [];
             }
-
             week.push(new Date(currentDay));
             currentDay = new Date(currentDay.getFullYear(), currentDay.getMonth(), currentDay.getDate() + 1);
         }
@@ -32,15 +43,18 @@ document.addEventListener('DOMContentLoaded', function () {
             week.push(null);
         }
 
+
+        const isCurrentDay = currentDay.toDateString() === new Date().toDateString();
+
         weeks.push(week);
 
+
         calendarGrid.innerHTML = weeks.map((week, weekIndex) => `
-        <tr key="${weekIndex}">
+           <tr key="${weekIndex}">
           ${week.map((day, dayIndex) => `
             <td
               key="${dayIndex}"
-              class="${day ? (selectedDates.some(selectedDate => selectedDate.getTime() === day.getTime()) ? 'selected' : '') : 'empty'}"
-
+              class="${day ? (selectedDates.some(selectedDate => selectedDate.getTime() === day.getTime()) ? 'selected' : '') : 'empty'}" 
             >
               ${day ? `<span class="date" data-date="${day.toISOString()}">${day.getDate()}</span>` : ''}
             </td>
@@ -52,6 +66,9 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.date').forEach(dateElement => {
             dateElement.addEventListener('click', () => handleDateClick(dateElement.getAttribute('data-date')));
         });
+
+        markCurrentDate()
+
     }
 
     function handlePrevMonth() {
